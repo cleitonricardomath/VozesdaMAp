@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vozes da Matemática Aplicada | Podcast</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#6b21a8', /* Roxo vibrante */
+                            dark: '#3b0764',   /* Roxo escuro para fundos */
+                            teal: '#0d9488',   /* Verde-água/Teal para contrastes */
+                            light: '#f8fafc',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar para as transcrições */
+        .transcript-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .transcript-content::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        .transcript-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .transcript-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        
+        /* Ocultar barra de áudio padrão feia em alguns navegadores e dar um visual mais limpo */
+        audio {
+            border-radius: 9999px;
+            height: 40px;
+            outline: none;
+        }
+        audio::-webkit-media-controls-panel {
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body class="font-sans bg-slate-50 text-slate-800 antialiased selection:bg-brand-teal selection:text-white">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <svg class="h-10 w-auto" viewBox="0 0 120 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Onda Sonora (Roxo) -->
+                        <path d="M5 25 L15 25 L22 10 L32 40 L42 5 L50 25" stroke="#6b21a8" stroke-width="4" stroke-linejoin="round"/>
+                        <!-- Transição -->
+                        <path d="M50 25 L65 25" stroke="#6b21a8" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M50 25 L65 25" stroke="#0d9488" stroke-width="4" stroke-linecap="round" stroke-dasharray="15" stroke-dashoffset="15" class="animate-pulse"/>
+                        <!-- Rede Neural/Geométrica (Teal) -->
+                        <circle cx="65" cy="25" r="4" fill="#0d9488"/>
+                        <circle cx="85" cy="10" r="3.5" fill="#0d9488"/>
+                        <circle cx="105" cy="25" r="3.5" fill="#0d9488"/>
+                        <circle cx="85" cy="40" r="3.5" fill="#0d9488"/>
+                        <circle cx="95" cy="25" r="2.5" fill="#0d9488"/>
+                        <path d="M65 25 L85 10 L105 25 L85 40 Z" stroke="#0d9488" stroke-width="2"/>
+                        <path d="M65 25 L95 25 L105 25" stroke="#0d9488" stroke-width="2"/>
+                        <path d="M85 10 L95 25 L85 40" stroke="#0d9488" stroke-width="2"/>
+                    </svg>
+                    <span class="ml-3 font-bold text-xl text-brand-dark leading-tight hidden sm:block">
+                        Vozes da <br> <span class="text-brand-purple">Matemática Aplicada</span>
+                    </span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#episodios" class="text-slate-600 hover:text-brand-purple font-medium transition-colors">Episódios</a>
+                    <a href="#videos" class="text-slate-600 hover:text-brand-purple font-medium transition-colors">Vídeos</a>
+                    <a href="#sobre" class="text-slate-600 hover:text-brand-purple font-medium transition-colors">Sobre</a>
+                    <a href="#episodios" class="bg-brand-purple hover:bg-brand-dark text-white px-5 py-2 rounded-full font-semibold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                        Ouvir Agora
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-brand-purple focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 absolute w-full shadow-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#episodios" class="block px-3 py-2 text-base font-medium text-slate-700 hover:text-brand-purple hover:bg-slate-50 rounded-md">Episódios</a>
+                <a href="#videos" class="block px-3 py-2 text-base font-medium text-slate-700 hover:text-brand-purple hover:bg-slate-50 rounded-md">Vídeos</a>
+                <a href="#sobre" class="block px-3 py-2 text-base font-medium text-slate-700 hover:text-brand-purple hover:bg-slate-50 rounded-md">Sobre</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <!-- Background Gradient Mapeado da Marca -->
+        <div class="absolute inset-0 bg-gradient-to-br from-brand-dark via-brand-purple to-brand-teal opacity-95"></div>
+        
+        <!-- Padrão Geométrico de Fundo -->
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 2px, transparent 2px); background-size: 40px 40px;"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center lg:text-left flex flex-col lg:flex-row items-center">
+            <div class="lg:w-1/2 lg:pr-12">
+                <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/10 text-brand-light backdrop-blur-sm border border-white/20 mb-6">
+                    <span class="flex h-2 w-2 rounded-full bg-brand-teal mr-2 animate-pulse"></span>
+                    <span class="text-sm font-semibold tracking-wide uppercase">Novo Episódio Disponível</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
+                    Decodificando o mundo através da <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal to-teal-200">Matemática</span>.
+                </h1>
+                <p class="text-lg md:text-xl text-brand-light/90 mb-10 max-w-2xl mx-auto lg:mx-0 font-light">
+                    Explore como modelos matemáticos, algoritmos e dados moldam nossa realidade. Da inteligência artificial à dinâmica de fluidos, conectamos a teoria acadêmica à prática do dia a dia.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#episodios" class="bg-white text-brand-purple font-bold px-8 py-4 rounded-full shadow-lg hover:bg-slate-50 hover:shadow-xl transition-all flex items-center justify-center">
+                        <i class="fas fa-play-circle text-xl mr-2 text-brand-teal"></i> Começar a Ouvir
+                    </a>
+                    <a href="https://open.spotify.com" target="_blank" class="bg-black/20 text-white border border-white/30 font-semibold px-8 py-4 rounded-full hover:bg-black/30 backdrop-blur-sm transition-all flex items-center justify-center">
+                        <i class="fab fa-spotify text-xl mr-2 text-green-400"></i> Spotify
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Hero Artwork (Representação 3D abstrata) -->
+            <div class="lg:w-1/2 mt-16 lg:mt-0 hidden md:block">
+                <div class="relative w-full aspect-square max-w-lg mx-auto">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-brand-teal to-brand-purple rounded-full blur-3xl opacity-40 animate-pulse"></div>
+                    <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Abstract Math Concept" class="relative z-10 w-full h-full object-cover rounded-3xl shadow-2xl mix-blend-overlay border border-white/10" style="border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; animation: morph 8s ease-in-out infinite;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção de Episódios com Áudio e Transcrição -->
+    <section id="episodios" class="py-20 bg-slate-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-brand-dark mb-4">Últimos Episódios</h2>
+                <div class="h-1 w-20 bg-brand-teal mx-auto rounded-full"></div>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Episódio 1 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-brand-teal font-bold text-sm tracking-wider uppercase">Episódio 03</span>
+                            <span class="text-slate-400 text-sm"><i class="far fa-calendar-alt mr-1"></i> 15 Mar 2026</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3">A Matemática das Epidemias e Redes Complexas</h3>
+                        <p class="text-slate-600 mb-6">Neste episódio, conversamos com a Dra. Silva sobre como equações diferenciais são usadas para prever a propagação de vírus em redes sociais e geográficas. Entenda o modelo SIR na prática.</p>
+                        
+                        <!-- Player de Áudio -->
+                        <div class="bg-slate-50 p-4 rounded-xl mb-6 border border-slate-200">
+                            <!-- Nota: Usando um arquivo de áudio público de teste para demonstração -->
+                            <audio controls class="w-full">
+                                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                                Seu navegador não suporta o elemento de áudio.
+                            </audio>
+                        </div>
+
+                        <!-- Ações -->
+                        <div class="flex flex-wrap gap-4 border-t border-slate-100 pt-6">
+                            <button onclick="toggleTranscript('transcricao-ep3')" class="flex items-center text-brand-purple hover:text-brand-dark font-medium transition-colors focus:outline-none">
+                                <i class="fas fa-file-alt mr-2"></i> Ler Transcrição
+                            </button>
+                            <a href="#" class="flex items-center text-slate-500 hover:text-brand-teal font-medium transition-colors ml-auto">
+                                <i class="fas fa-download mr-2"></i> Baixar MP3
+                            </a>
+                        </div>
+                        
+                        <!-- Transcrição Expandível -->
+                        <div id="transcricao-ep3" class="hidden mt-6 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden transition-all duration-300">
+                            <div class="bg-slate-100 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
+                                <span class="font-semibold text-slate-700 text-sm">Transcrição Completa</span>
+                                <button onclick="toggleTranscript('transcricao-ep3')" class="text-slate-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="p-4 md:p-6 text-slate-600 text-sm leading-relaxed max-h-80 overflow-y-auto transcript-content">
+                                <p><strong>Apresentador:</strong> Olá e bem-vindos a mais um episódio do Vozes da Matemática Aplicada. Hoje temos a honra de receber a Dra. Elena Silva, especialista em modelagem matemática de doenças infecciosas.</p>
+                                <p class="mt-4"><strong>Dra. Silva:</strong> Obrigada pelo convite. É um prazer estar aqui para desmistificar como os números nos ajudam a salvar vidas.</p>
+                                <p class="mt-4"><strong>Apresentador:</strong> Para começar, muitas pessoas ouvem falar sobre "achatar a curva". Como a matemática define essa curva?</p>
+                                <p class="mt-4"><strong>Dra. Silva:</strong> Excelente pergunta. Na matemática epidemiológica, usamos frequentemente compartimentos. O modelo mais básico é o SIR: Suscetíveis, Infectados e Recuperados. A curva que queremos achatar é o gráfico da derivada da função de pessoas infectadas em relação ao tempo, ou seja, $dI/dt$. Queremos que o pico dessa curva não ultrapasse a capacidade do sistema de saúde...</p>
+                                <p class="mt-4"><em>[A transcrição continua detalhando sistemas dinâmicos e grafos de contato interligados...]</em></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Episódio 2 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-brand-teal font-bold text-sm tracking-wider uppercase">Episódio 02</span>
+                            <span class="text-slate-400 text-sm"><i class="far fa-calendar-alt mr-1"></i> 01 Mar 2026</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3">Inteligência Artificial: A Álgebra Linear por trás do ChatGPT</h3>
+                        <p class="text-slate-600 mb-6">Desmistificamos o funcionamento das Redes Neurais e Grandes Modelos de Linguagem (LLMs). Descubra como multiplicações de matrizes e vetores de alta dimensionalidade geram textos coerentes.</p>
+                        
+                        <div class="bg-slate-50 p-4 rounded-xl mb-6 border border-slate-200">
+                            <audio controls class="w-full">
+                                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+                            </audio>
+                        </div>
+
+                        <div class="flex flex-wrap gap-4 border-t border-slate-100 pt-6">
+                            <button onclick="toggleTranscript('transcricao-ep2')" class="flex items-center text-brand-purple hover:text-brand-dark font-medium transition-colors focus:outline-none">
+                                <i class="fas fa-file-alt mr-2"></i> Ler Transcrição
+                            </button>
+                            <a href="#" class="flex items-center text-slate-500 hover:text-brand-teal font-medium transition-colors ml-auto">
+                                <i class="fas fa-download mr-2"></i> Baixar MP3
+                            </a>
+                        </div>
+                        
+                        <div id="transcricao-ep2" class="hidden mt-6 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                            <div class="bg-slate-100 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
+                                <span class="font-semibold text-slate-700 text-sm">Transcrição Completa</span>
+                                <button onclick="toggleTranscript('transcricao-ep2')" class="text-slate-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="p-4 md:p-6 text-slate-600 text-sm leading-relaxed max-h-80 overflow-y-auto transcript-content">
+                                <p><strong>Apresentador:</strong> Matrizes. Para muitos, um pesadelo do ensino médio. Para a IA moderna, o oxigênio.</p>
+                                <p class="mt-4"><strong>Convidado (Eng. de Machine Learning):</strong> Exatamente! Quando você digita um prompt no ChatGPT, suas palavras não são entendidas como letras, mas convertidas em vetores - listas de números flutuantes. O modelo realiza bilhões de multiplicações de matrizes para calcular as probabilidades da próxima palavra geométrica e estatisticamente mais provável...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <button class="px-6 py-3 border-2 border-brand-purple text-brand-purple rounded-full font-semibold hover:bg-brand-purple hover:text-white transition-colors">
+                    Ver todos os episódios
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção de Vídeos (Videocasts/YouTube) -->
+    <section id="videos" class="py-20 bg-white border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-brand-dark mb-4">Videocasts & Tutoriais</h2>
+                    <p class="text-slate-600 max-w-2xl">Acompanhe nossas gravações em estúdio e vídeos explicativos desenhando conceitos na lousa digital.</p>
+                </div>
+                <a href="https://youtube.com" target="_blank" class="mt-4 md:mt-0 text-red-600 font-semibold hover:text-red-700 flex items-center">
+                    <i class="fab fa-youtube text-2xl mr-2"></i> Inscreva-se no Canal
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Video Card 1 -->
+                <div class="group cursor-pointer">
+                    <div class="relative w-full aspect-video rounded-2xl overflow-hidden mb-4 shadow-md bg-slate-800">
+                        <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-16 h-16 bg-brand-purple/90 rounded-full flex items-center justify-center shadow-lg group-hover:bg-brand-teal transition-colors duration-300">
+                                <i class="fas fa-play text-white text-xl ml-1"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">14:20</div>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-800 group-hover:text-brand-purple transition-colors line-clamp-2">Entendendo a Transformada de Fourier de forma visual</h4>
+                </div>
+
+                <!-- Video Card 2 -->
+                <div class="group cursor-pointer">
+                    <div class="relative w-full aspect-video rounded-2xl overflow-hidden mb-4 shadow-md bg-slate-800">
+                        <img src="https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-16 h-16 bg-brand-purple/90 rounded-full flex items-center justify-center shadow-lg group-hover:bg-brand-teal transition-colors duration-300">
+                                <i class="fas fa-play text-white text-xl ml-1"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">45:10</div>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-800 group-hover:text-brand-purple transition-colors line-clamp-2">[Estúdio] Ep 03: A Matemática das Epidemias (Gravação Completa)</h4>
+                </div>
+
+                <!-- Video Card 3 -->
+                <div class="group cursor-pointer">
+                    <div class="relative w-full aspect-video rounded-2xl overflow-hidden mb-4 shadow-md bg-slate-800">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-16 h-16 bg-brand-purple/90 rounded-full flex items-center justify-center shadow-lg group-hover:bg-brand-teal transition-colors duration-300">
+                                <i class="fas fa-play text-white text-xl ml-1"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">08:15</div>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-800 group-hover:text-brand-purple transition-colors line-clamp-2">O que é a Teoria dos Jogos? (Animação)</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter / Apoio -->
+    <section class="py-16 relative overflow-hidden bg-brand-dark">
+        <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <!-- Background geométrico sutil -->
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.5"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+        
+        <div class="max-w-4xl mx-auto px-4 relative z-10 text-center">
+            <h2 class="text-3xl font-bold text-white mb-4">Junte-se à nossa comunidade</h2>
+            <p class="text-brand-light/80 mb-8 max-w-2xl mx-auto">Receba materiais complementares, equações detalhadas dos episódios e referências bibliográficas diretamente no seu e-mail.</p>
+            
+            <form class="flex flex-col sm:flex-row max-w-lg mx-auto gap-2" onsubmit="event.preventDefault(); alert('Inscrição realizada com sucesso!');">
+                <input type="email" placeholder="Seu melhor e-mail acadêmico ou pessoal" required class="flex-1 px-5 py-3 rounded-full text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-teal w-full">
+                <button type="submit" class="bg-brand-teal hover:bg-teal-500 text-white font-bold py-3 px-8 rounded-full transition-colors w-full sm:w-auto shadow-lg">
+                    Inscrever-se
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="sobre" class="bg-white border-t border-slate-200 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                
+                <!-- Logo & About -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <svg class="h-8 w-auto" viewBox="0 0 120 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 25 L15 25 L22 10 L32 40 L42 5 L50 25" stroke="#6b21a8" stroke-width="4" stroke-linejoin="round"/>
+                            <path d="M50 25 L65 25" stroke="#0d9488" stroke-width="4" stroke-linecap="round"/>
+                            <circle cx="65" cy="25" r="4" fill="#0d9488"/>
+                            <circle cx="85" cy="10" r="3.5" fill="#0d9488"/>
+                            <circle cx="105" cy="25" r="3.5" fill="#0d9488"/>
+                            <circle cx="85" cy="40" r="3.5" fill="#0d9488"/>
+                            <path d="M65 25 L85 10 L105 25 L85 40 Z" stroke="#0d9488" stroke-width="2"/>
+                        </svg>
+                        <span class="ml-2 font-bold text-lg text-brand-dark leading-tight">
+                            Vozes da <br> Matemática Aplicada
+                        </span>
+                    </div>
+                    <p class="text-slate-500 mb-6 text-sm pr-4">
+                        Um podcast dedicado a traduzir a complexidade do mundo através de modelos matemáticos. Criado por pesquisadores para curiosos, estudantes e profissionais da ciência de dados, engenharia e áreas correlatas.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-brand-purple hover:text-white transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-brand-purple hover:text-white transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-brand-purple hover:text-white transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-brand-purple hover:text-white transition-colors">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Links Rápidos -->
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-4 uppercase text-sm tracking-wider">Explorar</h4>
+                    <ul class="space-y-2 text-slate-500">
+                        <li><a href="#episodios" class="hover:text-brand-teal transition-colors">Todos os Episódios</a></li>
+                        <li><a href="#videos" class="hover:text-brand-teal transition-colors">Videocasts</a></li>
+                        <li><a href="#" class="hover:text-brand-teal transition-colors">Artigos de Apoio</a></li>
+                        <li><a href="#" class="hover:text-brand-teal transition-colors">Nossa Equipe</a></li>
+                    </ul>
+                </div>
+
+                <!-- Onde Ouvir -->
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-4 uppercase text-sm tracking-wider">Onde Ouvir</h4>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="flex items-center text-slate-500 hover:text-slate-800 transition-colors">
+                                <i class="fab fa-spotify text-green-500 text-xl mr-3 w-5 text-center"></i> Spotify
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-slate-500 hover:text-slate-800 transition-colors">
+                                <i class="fab fa-apple text-slate-800 text-xl mr-3 w-5 text-center"></i> Apple Podcasts
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-slate-500 hover:text-slate-800 transition-colors">
+                                <i class="fab fa-google text-blue-500 text-xl mr-3 w-5 text-center"></i> Google Podcasts
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-slate-500 hover:text-slate-800 transition-colors">
+                                <i class="fas fa-rss text-orange-500 text-xl mr-3 w-5 text-center"></i> Feed RSS
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
+                <p>&copy; 2026 Vozes da Matemática Aplicada. Todos os direitos reservados.</p>
+                <div class="mt-4 md:mt-0 space-x-4">
+                    <a href="#" class="hover:text-brand-purple">Privacidade</a>
+                    <a href="#" class="hover:text-brand-purple">Termos de Uso</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Toggle mobile menu
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Toggle transcript collapse/expand
+        function toggleTranscript(id) {
+            const element = document.getElementById(id);
+            if (element.classList.contains('hidden')) {
+                element.classList.remove('hidden');
+                // Pequena animação para deslizar suavemente
+                element.style.opacity = 0;
+                setTimeout(() => {
+                    element.style.transition = 'opacity 0.3s ease-in-out';
+                    element.style.opacity = 1;
+                }, 10);
+            } else {
+                element.style.opacity = 0;
+                setTimeout(() => {
+                    element.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // Navbar shadow effect on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-md');
+                nav.classList.remove('shadow-sm');
+            } else {
+                nav.classList.remove('shadow-md');
+                nav.classList.add('shadow-sm');
+            }
+        });
+
+        // Adicionar keyframes arbitrários para a animação do background morph no Tailwind inline
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes morph {
+                0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+                34% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
+                67% { border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%; }
+                100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
